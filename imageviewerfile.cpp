@@ -73,9 +73,8 @@ ImageViewerFile::~ImageViewerFile()
     cleanUp();
 }
 
-ImageViewerFile::OpenResult ImageViewerFile::open(QString *errorString, const QString &fileName, const QString &realFileName)
+ImageViewerFile::OpenResult ImageViewerFile::open(QString *errorString, const QString &fileName)
 {
-    QTC_CHECK(fileName == realFileName); // does not support auto save
     OpenResult success = openImpl(errorString, fileName);
     emit openFinished(success == OpenResult::Success);
     return success;

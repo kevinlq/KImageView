@@ -81,8 +81,7 @@ public:
     ImageViewerFile();
     ~ImageViewerFile() override;
 
-    OpenResult open(QString *errorString, const QString &fileName,
-                    const QString &realFileName);
+    OpenResult open(QString *errorString, const QString &fileName);
 
     ReloadBehavior reloadBehavior(ChangeTrigger state, ChangeType type) const;
     bool reload(QString *errorString, ReloadFlag flag, ChangeType type) ;

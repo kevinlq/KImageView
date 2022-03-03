@@ -69,6 +69,10 @@
 #include <QSvgRenderer>
 #endif
 
+#include <QDragEnterEvent>
+#include <QMimeData>
+#include <QDebug>
+
 namespace ImageViewer {
 namespace Constants {
     const qreal DEFAULT_SCALE_FACTOR = 1.2;
@@ -86,6 +90,9 @@ ImageView::ImageView(ImageViewerFile *file)
     setFrameShape(QFrame::NoFrame);
     setRenderHint(QPainter::SmoothPixmapTransform);
 
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     // Prepare background check-board pattern
     QPixmap tilePixmap(64, 64);
     tilePixmap.fill(Qt::white);
@@ -96,6 +103,8 @@ ImageView::ImageView(ImageViewerFile *file)
     tilePainter.end();
 
     setBackgroundBrush(tilePixmap);
+
+    setAcceptDrops(true);
 }
 
 ImageView::~ImageView()
@@ -220,6 +229,40 @@ void ImageView::fitToScreen()
 {
     fitInView(m_imageItem, Qt::KeepAspectRatio);
     emitScaleFactor();
+}
+
+void ImageView::dragEnterEvent(QDragEnterEvent *pEvent)
+{
+    if (pEvent->mimeData()->hasFormat("text/uri-list"))
+    {
+        pEvent->acceptProposedAction();
+    }
+}
+
+void ImageView::dragMoveEvent(QDragMoveEvent  *pEvent)
+{
+    if (pEvent->mimeData()->hasFormat("text/uri-list"))
+    {
+        pEvent->acceptProposedAction();
+    }
+}
+
+void ImageView::dropEvent(QDropEvent *pEvent)
+{
+    QList<QUrl> urls = pEvent->mimeData()->urls();
+    if (urls.isEmpty())
+    {
+        return;
+    }
+
+    QString fileName = urls.first().toLocalFile();
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    QString strError = "";
+    m_file->open(&strError, fileName);
 }
 
 void ImageView::emitScaleFactor()

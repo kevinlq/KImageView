@@ -74,6 +74,10 @@ public:
     void resetToOriginalSize();
     void fitToScreen();
 
+    void dragEnterEvent(QDragEnterEvent *pEvent) override;
+    void dragMoveEvent(QDragMoveEvent  *pEvent) override;
+    void dropEvent(QDropEvent *pEvent) override;
+
 signals:
     void scaleFactorChanged(qreal factor);
     void imageSizeChanged(const QSize &size);

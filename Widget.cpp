@@ -10,17 +10,31 @@
 #include <QToolButton>
 #include <QDebug>
 
+
 struct ImageViewerPrivate
 {
     QString displayName;
     QSharedPointer<ImageViewer::Internal::ImageViewerFile> file;
     ImageViewer::Internal::ImageView *m_pImageView = nullptr;
+
+    bool openFile(const QString &strFile);
 };
+
+bool ImageViewerPrivate::openFile(const QString &strFile)
+{
+    using Result = ImageViewer::Internal::ImageViewerFile::OpenResult;
+    QString strError = "";
+    Result eResult = file->open(&strError, strFile);
+
+    return eResult == Result::Success;
+}
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , m_pImpl(new ImageViewerPrivate)
 {
+    setAcceptDrops(true);
+
     m_pImpl->file.reset(new ImageViewer::Internal::ImageViewerFile);
     m_pImpl->m_pImageView = new ImageViewer::Internal::ImageView(m_pImpl->file.data());
 
@@ -80,13 +94,6 @@ Widget::Widget(QWidget *parent)
             m_pImpl->m_pImageView, &ImageViewer::Internal::ImageView::createScene);
     connect(m_pImpl->file.data(), &ImageViewer::Internal::ImageViewerFile::aboutToReload,
             m_pImpl->m_pImageView, &ImageViewer::Internal::ImageView::reset);
-
-    QString strError = "";
-    QString strFile = "D:/ui.gif";
-    QString realFn = strFile;
-    ImageViewer::Internal::ImageViewerFile::OpenResult result = m_pImpl->file->open(&strError, strFile, realFn);
-
-    //qDebug() << "open file :" << (int)result << strError << (int)m_pImpl->file->type();
 }
 
 Widget::~Widget()
@@ -94,4 +101,3 @@ Widget::~Widget()
     delete m_pImpl;
     m_pImpl = nullptr;
 }
-
